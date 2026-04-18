@@ -133,3 +133,55 @@ LLM_WEIGHT=0.40
 ```
 
 Swap `SPAM_MODEL_NAME` for any HF text-classification model with "spam"/"ham" labels (e.g. a distilbert variant) without touching code.
+
+## Evaluation prep (quick)
+
+Use this as a pre-demo checklist:
+
+- [ ] Backend running (`./backend/run.sh`) and `/api/health` returns `{"status":"ok"}`
+- [ ] Frontend running (`npm run dev`) and navbar API badge is green
+- [ ] `backend/.env` has a valid `MISTRAL_API_KEY`
+- [ ] First-run model downloads completed before judging
+- [ ] `Test mails.md` loaded so the demo flow is deterministic
+- [ ] Backup screen recording prepared in case of network/API instability
+
+## 2-minute technical walkthrough script
+
+1. **Problem and flow**: paste raw inbox, split by `---EMAIL---`, run triage pipeline, surface highest-value opportunities.
+2. **Spam robustness**: local HF spam model does first-pass filtering; only flagged emails are sent to Mistral Small for verification.
+3. **Relevance quality**: score uses three signals (BM25 + MiniLM embedding + LLM reasoning) and a weighted average.
+4. **Explainability in UI**: score breakdown is visible per email card via the ⓘ popover.
+5. **Actionability**: top-ranked emails support prep guide, application draft, skill-gap detection, and skill quiz loops.
+
+## Judge Q&A (high-probability)
+
+**Q: What happens if the LLM API is slow or fails?**  
+**A:** Endpoints return structured 502 errors and the UI shows retry states. Health status is visible in the navbar so API issues are immediately obvious.
+
+**Q: Why not only use embeddings or only use an LLM score?**  
+**A:** Hybrid scoring reduces blind spots: BM25 captures exact skill terms, embeddings capture semantic similarity, and LLM score captures contextual fit.
+
+**Q: How do you control cost and latency?**  
+**A:** The pipeline routes tasks: small model for lightweight tasks (spam verification, drafting, skill detection), heavy model for quality-critical reasoning.
+
+**Q: Is this explainable to users?**  
+**A:** Yes. The final relevance score is decomposed into BM25/embedding/LLM components and exposed directly in each email card.
+
+**Q: Why is this more than an LLM wrapper?**  
+**A:** It combines local ML + retrieval-style scoring + LLM reasoning + product workflows (triage, ranking, prep, drafting, quiz), not just prompt-in/prompt-out.
+
+## Known limitations
+
+- No automated test suite yet (manual/demo validation only)
+- Authentication is demo-only (localStorage), not production-grade auth
+- No persistent backend database (state is frontend-local)
+- LLM-dependent endpoints require network and valid API credentials
+- First cold start can be slower due to model download/warmup
+
+## Near-term roadmap
+
+- Add backend smoke tests for `/api/health` and schema-level contract checks
+- Add request/response fixtures for triage regression testing
+- Add persistent storage for users, profile state, and triage history
+- Add token/cost instrumentation and latency dashboards per endpoint
+- Add graceful fallback mode when external LLM calls fail
