@@ -1,0 +1,40 @@
+# Python
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/**/*.pyo
+*.pyc
+*.pyo
+.Python
+
+# Environment — never commit secrets
+backend/.env
+.env
+.env.local
+.env.*.local
+# allow example files
+!.env.example
+!backend/.env.example
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.cache/
+
+# HuggingFace model cache (downloaded at runtime)
+.cache/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
